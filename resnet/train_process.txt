@@ -1,0 +1,28 @@
+Training process
+
+I --- With one set of images (~/Data2T/tile_images_old/resnet)
+1. Resnet50 model
+   Learning rate = 0.010
+   Epoch = 1
+   Batch size = 4
+   Binary Cross Entropy with Logits
+   Adam optimizer
+   model.params trained = True
+   Saved model backup file = 'tumor_model_1.pth'
+   
+2. Learning rate = 0.002
+   Epoch = 1
+   Batch size = 4
+   model.params trained = True
+   Saved model backup file = 'tumor_model_2.pth'
+
+
+II --- With new set of images (~/projects/camelyon17/tile_wsi/resnet/)
+1. Resnet 50 model
+   Learning rate = 0.010
+   Epoch = 1
+   Batch size = 4
+   Binary Cross Entropy with Logits
+   Adam optimzier
+   model.params trained = True
+   Saved model backup file = 'tumor_model_a.pth'
