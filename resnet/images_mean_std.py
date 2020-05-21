@@ -1,6 +1,7 @@
 # Discover the mean and std of images
 
-from train import * 
+import torch
+from train import load_data 
 
 train_dir = '/home/steveyang/projects/camelyon17/tile_images/resnet/cross_val_0/train'
 val_dir = '/home/steveyang/projects/camelyon17/tile_images/resnet/cross_val_0/val'

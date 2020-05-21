@@ -21,7 +21,7 @@ II --- With new set of images (~/projects/camelyon17/tile_wsi/resnet/)
 1. Resnet 50 model
    Learning rate = 0.010
    Epoch = 1
-   Batch size = 4
+   Batch size = 8
    Binary Cross Entropy with Logits
    Adam optimzier
    model.params trained = True

@@ -5,3 +5,4 @@ resnet/__pycache__
 deeplab
 resnet/old_files
 resnet/models
+resnet/checkpoints

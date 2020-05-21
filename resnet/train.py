@@ -11,8 +11,11 @@ from PIL import ImageFile
 
 train_dir = '/home/steveyang/projects/camelyon17/tile_images/resnet/cross_val_0/train'
 val_dir = '/home/steveyang/projects/camelyon17/tile_images/resnet/cross_val_0/val'
-mean = (0.7429569363594055, 0.5951971411705017, 0.75307297706604)
-std = (0.13754881918430328, 0.162648007273674, 0.10670391470193863)
+train_mean = (0.6985210180282593, 0.3701254725456238, 0.656425416469574) 
+train_std = (0.1374625712633133, 0.16258588433265686, 0.10656347870826721)
+val_mean = (0.7268304228782654, 0.4075404107570648, 0.6833457946777344)
+val_std = (0.13726474344730377, 0.16230422258377075, 0.1068471297621727)
+
 
 def load_data(train_dir, val_dir):
     ImageFile.LOAD_TRUNCATED_IMAGES = True
@@ -21,10 +24,10 @@ def load_data(train_dir, val_dir):
                                         transforms.RandomHorizontalFlip(),
                                         transforms.RandomVerticalFlip(), 
                                         transforms.ToTensor(),
-                                        transforms.Normalize(mean, std)])
+                                        transforms.Normalize(train_mean, train_std)])
     val_transforms = transforms.Compose([transforms.Resize(256),
                                         transforms.ToTensor(),
-                                        transforms.Normalize(mean, std)])
+                                        transforms.Normalize(val_mean, val_std)])
 
     train_data = datasets.ImageFolder(root=train_dir, transform=train_transforms)
     val_data = datasets.ImageFolder(root=val_dir, transform=val_transforms)
@@ -37,8 +40,8 @@ def load_data(train_dir, val_dir):
     train_sampler = WeightedRandomSampler(train_weights, len(train_weights))
     val_sampler = WeightedRandomSampler(val_weights, len(val_weights))
 
-    train_loader = torch.utils.data.DataLoader(train_data, batch_size=4, sampler=train_sampler)
-    val_loader = torch.utils.data.DataLoader(val_data, batch_size=4, sampler=val_sampler)
+    train_loader = torch.utils.data.DataLoader(train_data, batch_size=16, sampler=train_sampler)
+    val_loader = torch.utils.data.DataLoader(val_data, batch_size=16, sampler=val_sampler)
 
     return train_loader, val_loader
 
@@ -48,24 +51,19 @@ def train(train_dir, val_dir, checkpoint_file=None):
 
     train_loader, val_loader = load_data(train_dir, val_dir)
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    model = models.resnet50(pretrained=False)
+    model = models.wide_resnet50_2(pretrained=False)
 
     for param in model.parameters():
-        param.requires_grad = True
+        param.requires_grad = False
 
     model.fc = nn.Sequential(nn.Linear(2048, 512), 
                                     nn.ReLU(),
                                     nn.Dropout(0.2),
                                     nn.Linear(512, 1))
-                                    #nn.Tanh())
-                                    #nn.Sigmoid())
-                                    #nn.LogSoftmax(dim=1))
 
-    #criterion = nn.CrossEntropyLoss()
-    #criterion = nn.NLLLoss()
-    #criterion = nn.BCELoss()
     criterion = nn.BCEWithLogitsLoss()
-    optimizer = optim.Adam(model.parameters(), lr=0.010)
+    optimizer = optim.Adadelta(model.parameters(), lr=0.001)
+    #scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, factor=0.20, patience=1)
     model.to(device)
 
     if checkpoint_file is not None:
@@ -83,9 +81,9 @@ def train(train_dir, val_dir, checkpoint_file=None):
         train_accuracies, val_accuracies = [], []
 
 
-    epochs = 1 
+    epochs = 10 
     steps = 0
-    print_every = 20
+    print_every = 500
 
     for epoch in range(last_epoch+1, last_epoch+epochs+1):
         running_loss = 0.0
@@ -131,6 +129,7 @@ def train(train_dir, val_dir, checkpoint_file=None):
                         val_total += val_labels.size(0)
                         val_correct += (predicted == val_labels).sum().item()
                         val_accuracy = val_correct / val_total
+                    #scheduler.step(val_loss / len(val_loader))
 
                 train_losses.append(running_loss / print_every)
                 val_losses.append(val_loss / len(val_loader))
@@ -155,7 +154,7 @@ def train(train_dir, val_dir, checkpoint_file=None):
         'train_accuracies': train_accuracies,
         'val_accuracies': val_accuracies,}
 
-    torch.save(state, 'tumor_model.pth')
+    torch.save(state, 'tumor_model_wideresnet50_lr0.001_adadelta_10epochs_fn.pth')
 
 
 def calculate_weight(images, nclasses):
