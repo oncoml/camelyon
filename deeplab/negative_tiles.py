@@ -1,4 +1,4 @@
-# Copies tiles with and without tumor regions to the appropriate directories
+# Copies tiles without tumor regions to the appropriate directories
 
 import shutil
 from shutil import copyfile

@@ -1,5 +1,4 @@
 # Training Camelyon17 images on Deeplab with Pytorch
-# From the pytorch.org and blog of Chris Fotache
 
 import numpy as np
 import glob
@@ -56,17 +55,13 @@ def train(train_dir, val_dir, checkpoint_file=None):
     for param in model.parameters():
         param.requires_grad = True
 
-    #model.fc = nn.Sequential(nn.Linear(2048, 512), 
-    #                                nn.ReLU(),
-    #                                nn.Dropout(0.2),
-    #                                nn.Linear(512, 1))
+    model = nn.Sequential(model, CRF(n_spatial_dims=2)) 
 
-    #weights = torch.cuda.FloatTensor([1.0, 19.0])
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.SGD(model.parameters(), lr=0.002)
     model.to(device)
 
-    writer = SummaryWriter('runs/deeplab_experiment_9')
+    writer = SummaryWriter('runs/deeplab_experiment_11')
 
     epochs = 100 
     print_freq = 500
@@ -101,7 +96,7 @@ def train(train_dir, val_dir, checkpoint_file=None):
 
             try:
                 logps = model(inputs)
-                logps = logps['out'].squeeze(1)
+                #logps = logps['out'].squeeze(1)
             except:
                 continue
 
@@ -140,7 +135,7 @@ def train(train_dir, val_dir, checkpoint_file=None):
 
                 try:
                     val_logps = model(val_inputs)
-                    val_logps = val_logps['out'].squeeze(1)
+                    #val_logps = val_logps['out'].squeeze(1)
                 except:
                     continue
 
@@ -186,7 +181,7 @@ def train(train_dir, val_dir, checkpoint_file=None):
                     'dice_coef': dice_coef,
                     'mcc': val_mcc
                 },
-                os.path.join('./checkpoints', 'deeplab_resnet101_experiment_9_{}.pth'.format(epoch)))
+                os.path.join('./checkpoints', 'deeplab_resnet101_experiment_11_{}.pth'.format(epoch)))
 
 
 def calculate_weight(images, nclasses):

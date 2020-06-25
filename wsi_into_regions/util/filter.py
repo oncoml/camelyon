@@ -237,8 +237,8 @@ def filter_remove_small_objects(np_img, min_size=3000, avoid_overmask=True, over
   mask_percentage = mask_percent(rem_sm)
   if (mask_percentage >= overmask_thresh) and (min_size >= 1) and (avoid_overmask is True):
     new_min_size = min_size / 2
-    print("Mask percentage %3.2f%% >= overmask threshold %3.2f%% for Remove Small Objs size %d, so try %d" % (
-      mask_percentage, overmask_thresh, min_size, new_min_size))
+    #print("Mask percentage %3.2f%% >= overmask threshold %3.2f%% for Remove Small Objs size %d, so try %d" % (
+    #mask_percentage, overmask_thresh, min_size, new_min_size))
     rem_sm = filter_remove_small_objects(np_img, new_min_size, avoid_overmask, overmask_thresh, output_type)
   np_img = rem_sm
 
@@ -693,9 +693,9 @@ def filter_green_channel(np_img, green_thresh=200, avoid_overmask=True, overmask
   mask_percentage = mask_percent(gr_ch_mask)
   if (mask_percentage >= overmask_thresh) and (green_thresh < 255) and (avoid_overmask is True):
     new_green_thresh = math.ceil((255 - green_thresh) / 2 + green_thresh)
-    print(
-      "Mask percentage %3.2f%% >= overmask threshold %3.2f%% for Remove Green Channel green_thresh=%d, so try %d" % (
-        mask_percentage, overmask_thresh, green_thresh, new_green_thresh))
+    #print(
+    #  "Mask percentage %3.2f%% >= overmask threshold %3.2f%% for Remove Green Channel green_thresh=%d, so try %d" % (
+    #    mask_percentage, overmask_thresh, green_thresh, new_green_thresh))
     gr_ch_mask = filter_green_channel(np_img, new_green_thresh, avoid_overmask, overmask_thresh, output_type)
   np_img = gr_ch_mask
 
@@ -1007,7 +1007,7 @@ def apply_filters_to_image(slide_num, save=True, display=False):
     (used for HTML page generation).
   """
   t = Time()
-  print("Processing slide #%d" % slide_num)
+  #print("Processing slide #%d" % slide_num)
 
   info = dict()
 
@@ -1022,14 +1022,14 @@ def apply_filters_to_image(slide_num, save=True, display=False):
     result_path = slide.get_filter_image_result(slide_num)
     pil_img = util.np_to_pil(filtered_np_img)
     pil_img.save(result_path)
-    print("%-20s | Time: %-14s  Name: %s" % ("Save Image", str(t1.elapsed()), result_path))
+    #print("%-20s | Time: %-14s  Name: %s" % ("Save Image", str(t1.elapsed()), result_path))
 
     t1 = Time()
     thumbnail_path = slide.get_filter_thumbnail_result(slide_num)
     slide.save_thumbnail(pil_img, slide.THUMBNAIL_SIZE, thumbnail_path)
-    print("%-20s | Time: %-14s  Name: %s" % ("Save Thumbnail", str(t1.elapsed()), thumbnail_path))
+    #print("%-20s | Time: %-14s  Name: %s" % ("Save Thumbnail", str(t1.elapsed()), thumbnail_path))
 
-  print("Slide #%03d processing time: %s\n" % (slide_num, str(t.elapsed())))
+  #print("Slide #%03d processing time: %s\n" % (slide_num, str(t.elapsed())))
 
   return filtered_np_img, info
 
@@ -1145,12 +1145,12 @@ def save_filtered_image(np_img, slide_num, filter_num, filter_text):
   filepath = slide.get_filter_image_path(slide_num, filter_num, filter_text)
   pil_img = util.np_to_pil(np_img)
   pil_img.save(filepath)
-  print("%-20s | Time: %-14s  Name: %s" % ("Save Image", str(t.elapsed()), filepath))
+  #print("%-20s | Time: %-14s  Name: %s" % ("Save Image", str(t.elapsed()), filepath))
 
   t1 = Time()
   thumbnail_filepath = slide.get_filter_thumbnail_path(slide_num, filter_num, filter_text)
   slide.save_thumbnail(pil_img, slide.THUMBNAIL_SIZE, thumbnail_filepath)
-  print("%-20s | Time: %-14s  Name: %s" % ("Save Thumbnail", str(t1.elapsed()), thumbnail_filepath))
+  #print("%-20s | Time: %-14s  Name: %s" % ("Save Thumbnail", str(t1.elapsed()), thumbnail_filepath))
 
 
 def generate_filter_html_result(html_page_info):
@@ -1279,7 +1279,7 @@ def singleprocess_apply_filters_to_images(save=True, display=False, html=True, i
     image_num_list: Optionally specify a list of image slide numbers.
   """
   t = Time()
-  print("Applying filters to images\n")
+  #print("Applying filters to images\n")
 
   if image_num_list is not None:
     _, info = apply_filters_to_image_list(image_num_list, save, display)
@@ -1287,7 +1287,7 @@ def singleprocess_apply_filters_to_images(save=True, display=False, html=True, i
     num_training_slides = slide.get_num_training_slides()
     (s, e, info) = apply_filters_to_image_range(1, num_training_slides, save, display)
 
-  print("Time to apply filters to all images: %s\n" % str(t.elapsed()))
+  #print("Time to apply filters to all images: %s\n" % str(t.elapsed()))
 
   if html:
     generate_filter_html_result(info)
